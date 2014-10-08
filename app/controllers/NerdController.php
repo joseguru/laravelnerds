@@ -104,7 +104,33 @@ class NerdController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		//
+
+$rules = array(
+            'name'       => 'required',
+            'email'      => 'required|email',
+            'nerd_level' => 'required|numeric'
+        );
+        $validator = Validator::make(Input::all(), $rules);
+
+        // process the login
+        if ($validator->fails()) {
+            return Redirect::to('nerds/' . $id . '/edit')
+                ->withErrors($validator)
+                ->withInput(Input::except('password'));
+        } else {
+            // store
+            $nerd = Nerd::find($id);
+            $nerd->name       = Input::get('name');
+            $nerd->email      = Input::get('email');
+            $nerd->nerd_level = Input::get('nerd_level');
+            $nerd->save();
+
+            // redirect
+            Session::flash('message', 'Successfully updated nerd!');
+            return Redirect::to('nerds');
+        }
+
+
 	}
 
 
@@ -116,7 +142,11 @@ class NerdController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		//
+
+		$nerd = Nerd::find($id);
+		Session::flash('message', 'Successfully deleted the nerd!');
+		
+		Redirect::to('nerds');
 	}
 
 
